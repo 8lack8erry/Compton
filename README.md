@@ -82,7 +82,7 @@ We need to verify the linearity of the Analog-to-Digital Converter (ADC). To do 
 <p align="center">
   <img src="ADC/ADC_differenziale_formatura_gaussiana.png" alt="Differential ADC linearity" width="30%">
   <img src="ADC/ADC_integrale_formatura_gaussiana.png" alt="Integral ADC linearity" width="30%">
-  <img src="ADC/formatura_gaussiana_residual.png" alt="Integral ADC linearity - Residuals" width="30%">
+  <img src="ADC/formatura_gaussiana_residual.png" alt="Integral ADC linearity - Residuals" width="40%">
 </p>
 
 
