@@ -60,7 +60,10 @@ We need to determine the optimal High Voltage (HV) and Gain settings for the Ugo
   <img src="HV&Gain_calibration/Energetic_resolution/Heatmap/heatmap_Calibrazione_Franco_AMP.png" alt="Best parameters for Ugo - AMP TSCA" width="45%">
   <img src="HV&Gain_calibration/Energetic_resolution/Heatmap/heatmap_Calibrazione_Ugo_AMP-TSCA.png" alt="Best parameters for Franco - AMP" width="45%">
 </p>
-
+Analyzing these images we can see how the best values are: 
+  - **Ugo:** (HV = 600, Gain = 20)
+  - **Franco:** (HV = 650, Gain = 100)
+We choose this values in order to minimize the energetic resolution (/frac{\text{FWHM}}{\expval{E}})
 
 
 
