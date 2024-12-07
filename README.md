@@ -74,7 +74,8 @@ We select these values to minimize the energy resolution, $\frac{\text{FWHM}}{\l
 However, after evaluating the number of channels utilized out of the total 2048 with these parameters, we decided to adjust the settings and selected the following values:
 
   - **Ugo:** (HV = 600, Gain = 20)
-  - **Franco:** (HV = 600, Gain = 50)
+  - **Franco:** (HV = 650, Gain = 200)
+DA CONTROLLARE
 
 
 
