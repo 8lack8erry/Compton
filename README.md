@@ -63,7 +63,14 @@ We need to determine the optimal High Voltage (HV) and Gain settings for the Ugo
 Analyzing these images we can see how the best values are: 
   - **Ugo:** (HV = 600, Gain = 20)
   - **Franco:** (HV = 650, Gain = 100)
-We choose this values in order to minimize the energetic resolution (/frac{\text{FWHM}}{\expval{E}})
+We select these values to minimize the energy resolution, $/frac{\text{FWHM}}{\expval{E}}$, while avoiding operation near the boundary of the detector's performance range.
+
+
+
+
+
+
+
 
 
 
