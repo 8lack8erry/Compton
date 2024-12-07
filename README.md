@@ -77,18 +77,28 @@ However, after evaluating the number of channels utilized out of the total 2048 
   - **Franco:** (HV = 600, Gain = 50) CONTROLLA
 
 ### ADC linearity
-We need to verify the linearity of the Analog-to-Digital Converter (ADC). To do this, we began by using pulses with Gaussian shaping. Our measurements showed that the linearity is well maintained up to the first 250 channels. However, we encountered a limitation with the pulse generator module, which cannot produce amplitudes higher than 7 V. As a result, we need to replace the module to test the ADC linearity across the full range.
+We need to verify the linearity of the Analog-to-Digital Converter (ADC). To do this, we began by using pulses with Gaussian shaping. Our measurements showed that the linearity is well maintained up to the first 300 channels. However, we encountered a limitation with the pulse generator module, which cannot produce amplitudes higher than 7 volts.
 
 <p align="center">
-  <img src="ADC/ADC_differenziale_formatura_gaussiana.png" alt="Differential ADC linearity" width="50%">
+  <img src="ADC/ADC_differenziale_formatura_gaussiana.png" alt="Differential ADC linearity" width="40%">
 </p>
 <p align="center">
   <img src="ADC/ADC_integrale_formatura_gaussiana.png" alt="Integral ADC linearity" width="38%">
   <img src="ADC/formatura_gaussiana_residual.png" alt="Integral ADC linearity - Residuals" width="48%">
 </p>
 
+To address the issue described above, we replaced the module and were required to switch to semi-Gaussian shaping for the pulses.
 
+<p align="center">
+  <img src="ADC/ADC_differenziale_formatura_preamplificata.png" alt="Differential ADC linearity" width="40%">
+</p>
+<p align="center">
+  <img src="ADC/ADC_integrale_formatura_preamplificata.png" alt="Integral ADC linearity" width="38%">
+  <img src="ADC/formatura_preamplificata_residual.png" alt="Integral ADC linearity - Residuals" width="48%">
+</p>
 
+Both types of shaping show linearity, but we observe two distinct linearity curves. 
+Since the photopeak for the Franco detector is located around channel 1400, and the entire Compton spectrum falls below channel 1000, we are not concerned with studying the discontinuity observed near channel 1300.
 
 
 
