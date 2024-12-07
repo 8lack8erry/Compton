@@ -76,7 +76,7 @@ def fit_photopeak(hist, fileName, noise_threshold, n_peaks):
     f_true.SetParameter(2, f_picco.GetParameter(0))
     f_true.SetParameter(3, f_picco.GetParameter(1))
     f_true.SetParameter(4, f_picco.GetParameter(2))
-    mpr.stampa_graph_fit_range(hist, f_true, photopeak_x - extreme, photopeak_x + extreme, percorso_file + "h_fit" + fileName + ".png", "", "", "Counts", "", photopeak_x - extreme, photopeak_x + extreme, 5)
+    mpr.stampa_graph_fit(hist, f_true, photopeak_x - extreme, photopeak_x + extreme, percorso_file + "h_fit" + fileName + ".png", "", "", "Counts", "", photopeak_x - extreme, photopeak_x + extreme, 5)
 
     FWHM = 2.3548 * f_true.GetParameter(4)
 
