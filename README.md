@@ -57,8 +57,8 @@ We named the detector used for gating **Ugo** and the one dedicated to spectrosc
 ### Choosing the best parameters for the amplifiers
 We need to determine the optimal High Voltage (HV) and Gain settings for the Ugo detector, in combination with the TSCA amplifier, as well as for the Franco detector coupled with its amplifier. This ensures the detectors operate with maximum energy resolution and signal quality.
 <p align="center">
-  <img src="HV&Gain_calibration/Energetic_resolution/Heatmap/heatmap_Calibrazione_Franco_AMP.png" alt="Best parameters for Ugo - AMP TSCA" width="45%">
-  <img src="HV&Gain_calibration/Energetic_resolution/Heatmap/heatmap_Calibrazione_Ugo_AMP-TSCA.png" alt="Best parameters for Franco - AMP" width="45%">
+  <img src="HV&Gain_calibration/Energetic_resolution/Heatmap/heatmap_Calibrazione_Franco_AMP.png" alt="Best parameters for Franco - AMP" width="45%">
+  <img src="HV&Gain_calibration/Energetic_resolution/Heatmap/heatmap_Calibrazione_Ugo_AMP-TSCA.png" alt="Best parameters for Ugo - AMP TSCA" width="45%">
 </p>
 Analyzing these images we can see how the best values are:
 
@@ -68,8 +68,8 @@ Analyzing these images we can see how the best values are:
 We select these values to minimize the energy resolution, $\frac{\text{FWHM}}{\langle E \rangle}\$, while avoiding operation near the boundary of the detector's optimal performance range. 
 
 <p align="center">
-  <img src="HV&Gain_calibration/Peak_position/Heatmap/h_Franco - AMP.png" alt="Best parameters for Ugo - AMP TSCA" width="45%">
-  <img src="HV&Gain_calibration/Peak_position/Heatmap/h_Ugo-AMP - TSCA.png" alt="Best parameters for Franco - AMP" width="45%">
+  <img src="HV&Gain_calibration/Peak_position/Heatmap/h_Franco - AMP.png" alt="Best parameters for Franco - AMP" width="45%">
+  <img src="HV&Gain_calibration/Peak_position/Heatmap/h_Ugo - AMP-TSCA.png" alt="Best parameters for Ugo - AMP TSCA" width="45%">
 </p>
 However, after evaluating the number of channels utilized out of the total 2048 with these parameters, we decided to adjust the settings and selected the following values:
 
