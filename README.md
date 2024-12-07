@@ -68,10 +68,13 @@ Analyzing these images we can see how the best values are:
 We select these values to minimize the energy resolution, $\frac{\text{FWHM}}{\langle E \rangle}\$, while avoiding operation near the boundary of the detector's optimal performance range. 
 
 <p align="center">
-  <img src="HV&Gain_calibration/Peak_position/Heatmap/h_Franco-AMP.png" alt="Best parameters for Ugo - AMP TSCA" width="45%">
-  <img src="HV&Gain_calibration/Peak_position/Heatmap/h_Ugo-AMP-TSCA.png" alt="Best parameters for Franco - AMP" width="45%">
+  <img src="HV&Gain_calibration/Peak_position/Heatmap/h_Franco - AMP.png" alt="Best parameters for Ugo - AMP TSCA" width="45%">
+  <img src="HV&Gain_calibration/Peak_position/Heatmap/h_Ugo-AMP - TSCA.png" alt="Best parameters for Franco - AMP" width="45%">
 </p>
-But observing how many channel of the total 2048 with these parameters, we decide to make a change and chose the following
+However, after evaluating the number of channels utilized out of the total 2048 with these parameters, we decided to adjust the settings and selected the following values:
+
+  - **Ugo:** (HV = 600, Gain = 20)
+  - **Franco:** (HV = 600, Gain = 50)
 
 
 
