@@ -82,7 +82,7 @@ We need to verify the linearity of the Analog-to-Digital Converter (ADC). To do 
 <p align="center">
   <img src="ADC/ADC_differenziale_formatura_gaussiana.png" alt="Differential ADC linearity" width="28%">
   <img src="ADC/ADC_integrale_formatura_gaussiana.png" alt="Integral ADC linearity" width="28%">
-  <img src="ADC/formatura_gaussiana_residual.png" alt="Integral ADC linearity - Residuals" width="32%">
+  <img src="ADC/formatura_gaussiana_residui.png" alt="Integral ADC linearity - Residuals" width="32%">
 </p>
 
 To address the issue described above, we replaced the module and were required to switch to semi-Gaussian shaping for the pulses.
@@ -90,7 +90,7 @@ To address the issue described above, we replaced the module and were required t
 <p align="center">
   <img src="ADC/ADC_differenziale_formatura_preamplificata.png" alt="Differential ADC linearity" width="28%">
   <img src="ADC/ADC_integrale_formatura_preamplificata.png" alt="Integral ADC linearity" width="28%">
-  <img src="ADC/formatura_preamplificata_residual.png" alt="Integral ADC linearity - Residuals" width="32%">
+  <img src="ADC/formatura_preamplificata_residui.png" alt="Integral ADC linearity - Residuals" width="32%">
 </p>
 
 Both types of shaping show linearity, but we observe two distinct linearity curves. 
