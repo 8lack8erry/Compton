@@ -96,6 +96,16 @@ To address the issue described above, we replaced the module and were required t
 Both types of shaping show linearity, but we observe two distinct linearity curves. 
 Since the photopeak for the Franco detector is located around channel 1400, and the entire Compton spectrum falls below channel 1000, we are not concerned with studying the discontinuity observed near channel 1300.
 
+### Auto-coincidence measurement
+
+To perform this type of measurement, we need to modify the experimental setup so that the Ugo detector can be used for both generating the gate signal and performing spectroscopy.
+
+<div align="center">
+  <img src="experimental_setup.png" alt="Experimental setup" width="450">
+</div>
+
+
+
 
 
 
