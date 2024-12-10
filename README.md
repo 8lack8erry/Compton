@@ -104,7 +104,7 @@ To perform this type of measurement, we need to modify the experimental setup so
   <img src="autocoincidence_setup.png" alt="Experimental setup" width="450">
 </div>
 
-Performing this type of measurement is crucial for selecting the optimal gate window. This setup allows us to directly observe the gate window on the display, enabling precise adjustments. Specifically, our focus is on isolating and observing the photopeak of 511 keV gamma ray, which is essential for accurate gating and subsequent analysis.
+Performing this type of measurement is crucial for selecting the optimal gate window. This setup allows us to directly observe the gate window on the display, enabling precise adjustments. Specifically, our focus is on isolating and observing the photopeak of 511 keV gamma ray.
 
 
 
