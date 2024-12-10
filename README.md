@@ -101,7 +101,7 @@ Since the photopeak for the Franco detector is located around channel 1400, and 
 To perform this type of measurement, we need to modify the experimental setup so that the Ugo detector can be used for both generating the gate signal and performing spectroscopy.
 
 <div align="center">
-  <img src="experimental_setup.png" alt="Experimental setup" width="450">
+  <img src="autocoincidence_setup.png" alt="Experimental setup" width="450">
 </div>
 
 
