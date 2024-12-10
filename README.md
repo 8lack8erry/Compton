@@ -101,7 +101,7 @@ Since the photopeak for the Franco detector is located around channel 1400, and 
 To perform this type of measurement, we need to modify the experimental setup so that the Ugo detector can be used for both generating the gate signal and performing spectroscopy.
 
 <div align="center">
-  <img src="autocoincidence_setup.png" alt="Experimental setup" width="450">
+  <img src="autocoincidence_setup.png" alt="Experimental setup" width="400">
 </div>
 
 Performing this type of measurement is crucial for selecting the optimal gate window. This setup allows us to directly observe the gate window on the display, enabling precise adjustments. Specifically, our focus is on isolating and observing the photopeak of 511 keV gamma ray.
