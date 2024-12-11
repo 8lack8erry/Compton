@@ -73,8 +73,8 @@ We select these values to minimize the energy resolution, $\frac{\text{FWHM}}{\l
 </p>
 However, after evaluating the number of channels utilized out of the total 2048 with these parameters, we decided to adjust the settings and selected the following values:
 
-  - **Ugo:** (HV = 600, Gain = 20) CONTROLLA
-  - **Franco:** (HV = 600, Gain = 50) CONTROLLA
+  - **Ugo:** (HV = 900, Gain = 20)
+  - **Franco:** (HV = 600, Gain = 50)
 
 ### ADC linearity
 We need to verify the linearity of the Analog-to-Digital Converter (ADC). To do this, we began by using pulses with Gaussian shaping. Our measurements showed that the linearity is well maintained up to the first 300 channels. However, we encountered a limitation with the pulse generator module, which cannot produce amplitudes higher than 7 volts.
