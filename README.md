@@ -163,7 +163,7 @@ We calculated the optimal thickness of the target for various energies and decid
 We built the target structure using LEGO bricks.
 
 <div align="center"> 
-<img src="Target_structure/Lego_structure/Image2.png" alt="Lego structure" width="600"> 
+<img src="Target_structure/1_try/Lego_structure/Image2.png" alt="Lego structure" width="600"> 
 </div>
 
 To precisely rotate the target, we will use two servo motors controlled by an Arduino. One of these servo motors moves a laser to accurately align the spectroscopy detector, which will be positioned at a minimum distance of 60 cm from the target. The second servo motor will be responsible for rotating the target itself to specific angles required for the measurements.
