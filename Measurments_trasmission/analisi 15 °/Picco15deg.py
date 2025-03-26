@@ -35,13 +35,13 @@ def double_gauss_parabola(x, par):
 fit_func = TF1("fit_func", double_gauss_parabola, 1000, 1900, 9)
 
 def setup_fit_function(fit_func , i):
-    fit_func.SetParameters(150, 145, 100, 200, 1500, 100)
-    fit_func.SetParLimits(0, 100, 200)
+    fit_func.SetParLimits(0, 50, 500)
     fit_func.SetParLimits(1, 1400, 1500)
     fit_func.SetParLimits(2, 10, 120)
-    fit_func.SetParLimits(3, 50,200)   #DEVO DEFINIRE MEGLIO QUESTI LIMITI!!!
+    fit_func.SetParLimits(3, 10, 200)
     fit_func.FixParameter(4, 1490+i)
-    fit_func.SetParLimits(5, 10,200)
+    fit_func.SetParLimits(5, 5, 100)
+    
     return fit_func
 
 filename = "tot_15.txt"
@@ -53,17 +53,18 @@ centro = []
 err_centro = []
 
 for i in range(20) :
-
+    
+    fit_func = TF1("fit_func", double_gauss_parabola, 1000, 1900, 9)
     fit_func = setup_fit_function(fit_func , i )
-    hist.Fit(fit_func, "R")
-
-
+    fit_func.SetParameters(150, 1450, 60, 50, 1490+i, 20)
+    hist.Fit(fit_func, "R0")  # no draw
 
     #Creazione del canvas e fit
     canvas = TCanvas("c1", f"Fit Istogramma {1490 + i}" , 800, 600)
     hist.Draw()
-
+    fit_func.Draw("SAME")
     # Creazione delle singole componenti per il disegno
+    
     gauss1 = TF1("gauss1", "[0]*exp(-0.5*((x-[1])/[2])**2)", 700, 2000)
     gauss1.SetParameters(fit_func.GetParameter(0), fit_func.GetParameter(1) , fit_func.GetParameter(2))
     gauss1.SetLineColor(ROOT.kGreen)
@@ -76,7 +77,6 @@ for i in range(20) :
     bkg.SetParameters(fit_func.GetParameter(6), fit_func.GetParameter(7), fit_func.GetParameter(8))
     bkg.SetLineColor(ROOT.kOrange)
     bkg.SetLineStyle(2)  # Linea tratteggiata
-
 
     # Disegna le componenti individuali
     gauss1.Draw("SAME")
@@ -94,16 +94,3 @@ for i in range(20) :
 
     canvas.Update()
     canvas.SaveAs(f"Fit Istogramma {1490 + i}.png")
-
-  
-    
-    centro.append(fit_func.GetParameter(1))
-    err_centro.append(fit_func.GetParError(1))
-    
-
-plt.hist(centro, bins=30, color='red', alpha=0.6, label='distribuzione centroidi', edgecolor='black')
-plt.xlabel("centroidi")
-plt.ylabel("Frequenza")
-plt.legend()
-plt.savefig("histo.png")
-plt.show()
