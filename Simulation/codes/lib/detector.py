@@ -1,5 +1,5 @@
 import numpy as np
-import particles as p
+from . import particles as p
 import matplotlib.patches as patches
 
 class Object:
@@ -42,6 +42,24 @@ class Object:
         print(f"Molar mass: {self.molar_mass}")
 
 
+    def principal_axis(self) -> np.ndarray:
+        """
+        Calculate the principal axis of the object, which is the vector connecting the two points in the position tuple.
+
+        :return: The principal axis as a numpy array.
+        """
+        return np.array(self.position[1]) - np.array(self.position[0])
+    
+
+    def center(self) -> np.ndarray:
+        """
+        Calculate the center of the object.
+
+        :return: The center of the object as a numpy array.
+        """
+        return np.mean(self.position, axis=0) # axis=0 means that we take the mean of the two points in the position tuple
+    
+
     def is_inside(self, point: np.ndarray) -> bool:
         """
         Checks if a given point (position of a photon) is inside the object.
@@ -49,45 +67,56 @@ class Object:
         :param point: The position of the particle (numpy array).
         :return: True if the point is within the object, False otherwise.
         """
-        # Define the principal axis of the object, the one that is perpendicular to the two faces
-        # This axis is the one that connect the two point inside the position tuple
-        principal_axis = np.array(self.position[1]) - np.array(self.position[0])
-
-        # Rotate the axis (x, y, z) to align z with the principal axis, and the origin with the middle of the principal axis
-        # Calculate the center of the object
-        center = np.mean(self.position, axis=0) # axis=0 means that we take the mean of the two points in the position tuple
-        # Calculate the rotation matrix to align the principal axis with the z-axis
-        z_axis = principal_axis / np.linalg.norm(principal_axis)
-
-        # Calculate the rotation matrix using the axis-angle representation
-        # Calculate the angle between the z-axis and the principal axis
-        sin_alpha = np.linalg.norm(np.cross(z_axis, np.array([0, 0, 1])))
+        # Ensure point is a numpy array
+        point = np.array(point)
+        
+        # Define the principal axis of the object
+        principal_axis = self.principal_axis()
+        axis_length = np.linalg.norm(principal_axis)
+        
+        # Get center and normalize axis
+        center = self.center()
+        if axis_length == 0:
+            return False  # Degenerate cylinder
+        
+        axis_unit = principal_axis / axis_length
+        
+        # Calculate the rotation matrix to align the principal axis with the y-axis
+        # Note: The code was using y_axis but trying to align with different axes
+        
+        # Calculate angle between principal axis and y-axis
+        sin_alpha = np.linalg.norm(np.cross(axis_unit, np.array([0, 1, 0])))
         alpha = np.arcsin(sin_alpha)
-
-        # Calculate the rotation matrix
+        
+        # Calculate rotation matrix
         rotation_matrix = np.array([
-            [np.cos(alpha), -np.sin(alpha), 0],
-            [np.sin(alpha), np.cos(alpha), 0],
-            [0, 0, 1]
+            [np.cos(alpha), 0, np.sin(alpha)],
+            [0, 1, 0],
+            [-np.sin(alpha), 0, np.cos(alpha)]
         ])
-
-        # Rotate the point to align with the new coordinate system
+        
+        # Rotate the point to align with the rotated coordinate system
         rotated_point = np.dot(rotation_matrix, point - center)
-        # Check if the rotated point is within the cylinder   
-        r = np.linalg.norm(rotated_point[[0, 1]]) <= self.radius  # Check radial distance
-        z = 0  # Check z-coordinate
-        if self.position[0][2] > self.position[1][2]:
-            z = self.position[0][2] <= rotated_point[2] <= self.position[1][2]
-        else:
-            z = self.position[1][2] <= rotated_point[2] <= self.position[0][2]
-        return r and z  # Both conditions must be true to be inside the object
+        
+        # Check radial distance (in x-z plane of rotated coordinates)
+        r = np.linalg.norm(rotated_point[[0, 2]]) <= self.radius
+        
+        # Check if point is within cylinder height
+        # Half-length of cylinder along principal axis
+        half_length = axis_length / 2
+        
+        # Check if y-coordinate in rotated system is within half-length
+        h = abs(rotated_point[1]) <= half_length
+        
+        return r and h  # Both conditions must be true
     
 
-    def rotate(self, theta: float, axis: str):
+    def rotate(self, theta: float, rotation_center: list[float], axis: str):
         """
         Rotate the object around the center of the object and a given axis by a given angle.
 
         :param theta: Angle of rotation in radians.
+        :param rotation_center: Center of rotation as a list of floats.
         :param axis: Axis of rotation as a string, "x", "y", "z".
         :return: Rotated object position.
         """
@@ -113,10 +142,10 @@ class Object:
         else:
             raise ValueError("Axis must be 'x', 'y' or 'z'.")
 
-        # Rotate the object position
-        center = np.mean(self.position, axis=0)  # Center of the object
+        rotation_center = np.array(rotation_center)
+
         # Rotate the position of the object around the center
-        rotated_position = [np.dot(rotation_matrix, self.position[i] - center) + center for i in range(2)]
+        rotated_position = [np.dot(rotation_matrix, self.position[i] - rotation_center) + rotation_center for i in range(2)]
         # Update the position of the object
         self.position = (rotated_position[0], rotated_position[1])
         return rotated_position
@@ -132,12 +161,12 @@ class Object:
         :param label: Label for the detector in the legend.
         """
         # Get the principal axis and normalize it
-        principal_axis = np.array(self.position[1]) - np.array(self.position[0])
+        principal_axis = self.principal_axis()
         height = np.linalg.norm(principal_axis)
         direction = principal_axis / height
         
         # Get center point of the cylinder
-        center = np.mean(self.position, axis=0)
+        center = self.center()
         
         # Create orthogonal vectors to the principal axis
         # First, find a vector perpendicular to the direction
@@ -194,6 +223,121 @@ class Object:
             
             ax.plot_surface(xyz_cap[:, :, 0], xyz_cap[:, :, 1], xyz_cap[:, :, 2], 
                             color=color, alpha=alpha, edgecolor='none')       
+
+
+    def draw_plotly_3D(self, color='blue', alpha=0.7, name=None):
+        """
+        Creates a Plotly mesh3d representation of the cylindrical object.
+        
+        Args:
+            color: Color of the cylinder
+            alpha: Transparency of the cylinder (0-1)
+            name: Name for the trace in the legend
+            
+        Returns:
+            Plotly mesh3d trace object
+        """
+        import plotly.graph_objects as go
+        
+        # Get the principal axis and normalize it
+        principal_axis = self.principal_axis()
+        height = np.linalg.norm(principal_axis)
+        if height == 0:
+            return None  # Can't create a cylinder with zero height
+            
+        direction = principal_axis / height
+        
+        # Get center point of the cylinder
+        center = self.center()
+        
+        # Create orthogonal vectors to the principal axis
+        # First, find a vector perpendicular to the direction
+        if np.abs(direction[0]) < np.abs(direction[1]) and np.abs(direction[0]) < np.abs(direction[2]):
+            ortho = np.array([1, 0, 0])
+        elif np.abs(direction[1]) < np.abs(direction[0]) and np.abs(direction[1]) < np.abs(direction[2]):
+            ortho = np.array([0, 1, 0])
+        else:
+            ortho = np.array([0, 0, 1])
+        
+        # Create the basis vectors for the cylinder
+        v1 = np.cross(direction, ortho)
+        v1 = v1 / np.linalg.norm(v1)
+        v2 = np.cross(direction, v1)
+        
+        # Number of points around the cylinder circumference
+        n_theta = 36
+        
+        # Create points for the vertices of the mesh
+        theta = np.linspace(0, 2*np.pi, n_theta)
+        vertices = []
+        # Create vertices for top and bottom circles
+        for t in theta:
+            circle_pt = self.radius * (v1 * np.cos(t) + v2 * np.sin(t))
+            # Bottom circle point
+            vertices.append(list(center - direction * height/2 + circle_pt))
+            # Top circle point
+            vertices.append(list(center + direction * height/2 + circle_pt))
+        
+        # Create indices for triangular faces
+        i_vals = []
+        j_vals = []
+        k_vals = []
+        
+        # Connect vertices to form triangles
+        for i in range(n_theta):
+            i0 = 2 * i
+            i1 = 2 * i + 1
+            i2 = 2 * ((i + 1) % n_theta)
+            i3 = 2 * ((i + 1) % n_theta) + 1
+            
+            # Triangle 1 (connecting points on adjacent sides)
+            i_vals.append(i0)
+            j_vals.append(i2)
+            k_vals.append(i1)
+            
+            # Triangle 2 (for the other half of the quad)
+            i_vals.append(i1)
+            j_vals.append(i2)
+            k_vals.append(i3)
+        
+        # Add triangles for the bottom cap
+        # First add center of bottom cap as a vertex
+        bottom_center_idx = len(vertices)
+        vertices.append(list(center - direction * height/2))
+        
+        for i in range(n_theta):
+            i0 = 2 * i
+            i2 = 2 * ((i + 1) % n_theta)
+            
+            i_vals.append(bottom_center_idx)
+            j_vals.append(i0)
+            k_vals.append(i2)
+        
+        # Add triangles for the top cap
+        # Add center of top cap as a vertex
+        top_center_idx = len(vertices)
+        vertices.append(list(center + direction * height/2))
+        
+        for i in range(n_theta):
+            i1 = 2 * i + 1
+            i3 = 2 * ((i + 1) % n_theta) + 1
+            
+            i_vals.append(top_center_idx)
+            j_vals.append(i3)
+            k_vals.append(i1)
+        
+        # Create the mesh3d trace
+        return go.Mesh3d(
+            x=[v[0] for v in vertices],
+            y=[v[1] for v in vertices],
+            z=[v[2] for v in vertices],
+            i=i_vals,
+            j=j_vals,
+            k=k_vals,
+            color=color,
+            opacity=alpha,
+            name=name or "Cylinder"
+        )
 
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -267,7 +411,7 @@ class Detector(Object):
         :param electron: The incident electron.
         :return: The detected energy (simulated by applying resolution).
         """
-        return self.resolution(electron.energy) + self.exponential_background(electron.energy)    
+        return self.resolution(electron.energy)
 
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
