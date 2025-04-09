@@ -61,8 +61,8 @@ class Source:
         # Calculate direction components (unit vectors)
         directions = np.vstack([
             np.sin(theta) * np.cos(phi),
-            np.sin(theta) * np.sin(phi),
-            np.cos(theta)
+            np.cos(theta),
+            np.sin(theta) * np.sin(phi)
         ]).T
         return directions
     
@@ -152,32 +152,16 @@ class Source:
                    color='black', marker='o', label='Source Position')
         ax.text(self.position[0], self.position[1], self.position[2], 
                 'Source', color='black', fontsize=12)
-        
-    def draw_plotly_3D(self, fig):
-        """
-        Draw the source position in 3D space using Plotly.
-        
-        :param fig: Plotly figure object.
-        """
-        fig.add_trace(go.Scatter3d(
-            x=[self.position[0]],
-            y=[self.position[1]],
-            z=[self.position[2]],
-            mode='markers',
-            marker=dict(size=5, color='black')
-        ))
+
 
     def draw_plotly_3D(self, color='black', alpha=1.0, name=None):
         """
         Creates a Plotly representation of the source.
         
-        Args:
-            color: Color of the source point
-            alpha: Opacity of the source marker (0-1)
-            name: Name for the trace
-            
-        Returns:
-            Plotly scatter3d trace object
+        :param color: Color of the source marker.
+        :param alpha: Opacity of the marker.
+        :param name: Name of the source in the legend.
+        :return: Plotly Scatter3d object representing the source.
         """        
         return go.Scatter3d(
             x=[self.position[0]],
