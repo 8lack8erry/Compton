@@ -106,29 +106,32 @@ def fit_dataset(xvals, yvals, color, marker_style, legend_label):
     A = fit_func.GetParameter(0)
     B = fit_func.GetParameter(1)
     C = fit_func.GetParameter(2)
+    D = fit_func.GetParameter(3)
     
-    return graph, fit_func, A, B, C
+    return graph, fit_func, A, B, C, D
 
 
 # --------------------------------------------------------------------
 # 3) FITTIAMO I 3 SET DI DATI
 # --------------------------------------------------------------------
 # Assegniamo a ciascuno un colore e uno stile differente
-graph_2, fit_2, A2, B2, C2 = fit_dataset(
+graph_2, fit_2, A2, B2, C2 , D2 = fit_dataset(
     x_2pollici, y_2pollici,
     color=ROOT.kBlue, 
     marker_style=20,
     legend_label="2'' "
 )
 
-graph_1_5, fit_1_5, A1_5, B1_5, C1_5 = fit_dataset(
+print(A2, B2, C2, D2)
+
+graph_1_5, fit_1_5, A1_5, B1_5, C1_5, D1_5 = fit_dataset(
     x_1_5pollici, y_1_5pollici,
     color=ROOT.kRed,
     marker_style=21,
     legend_label="1_5''"
 )
 
-graph_3, fit_3, A3, B3, C3 = fit_dataset(
+graph_3, fit_3, A3, B3, C3, D3 = fit_dataset(
     x_3pollici, y_3pollici,
     color=ROOT.kGreen+2,
     marker_style=22,
@@ -182,7 +185,7 @@ y_1=[]
 for i in range(7):
     y_1.append(interpolate_parameter(diams, [y_1_5pollici[i], y_2pollici[i], y_3pollici[i]],i))
 
-graph_1, fit_1, A1, B1, C1 = fit_dataset(
+graph_1, fit_1, A1, B1, C1, D1 = fit_dataset(
     x_2pollici, y_1,
     color=ROOT.kMagenta, 
     marker_style=24,
@@ -242,6 +245,13 @@ c.SaveAs("Efficienze.png")
 
 
 #-------------- STAMPA VALORI A SCHERMO --------
+
+print("\nParametri del fit per il rivelatore da 2 pollici (A*x^-B*exp(-C*x)+D):")
+print(f"  A = {fit_2.GetParameter(0):.5f}")
+print(f"  B = {fit_2.GetParameter(1):.5f}")
+print(f"  C = {fit_2.GetParameter(2):.5f}")
+print(f"  D = {fit_2.GetParameter(3):.5f}\n")
+
 
 print("\nPrevisioni efficienza per 1'' usando il fit:")
 print(f"x = 0.511 MeV → efficienza = {fit_1.Eval(0.511):.5f} \n")
