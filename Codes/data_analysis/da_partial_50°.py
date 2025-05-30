@@ -5,19 +5,20 @@ from lib import MoraPyRoot as mpr
 from lib import LabLibrary as ll
 
 
-#file_path = "/mnt/c/Users/User/Desktop/info/Compton/Measurments_trasmission/50_deg/"
-file_path = "/mnt/c/Users/ASUS/Desktop/WSL_shared/Compton/Measurments_riflection/50_deg/"
+# file_path = "/mnt/c/Users/User/Desktop/info/Compton/Measurments/Measurments_riflection/50_deg/"
+file_path = "/mnt/c/Users/User/Desktop/info/Compton/Measurments/Measurments_trasmission/50_deg/"
 
+#file_path = "/mnt/c/Users/ASUS/Desktop/WSL_shared/Compton/Measurments/Measurments_riflection/50_deg/"
 
-def fit_peaks(hist, peak, sigma, min_fit, max_fit, x_axis_name, y_axis_name, file_path):
+def fit_peaks(hist, peak, sigma, left_step, right_step, x_axis_name, y_axis_name, file_path):
     """
     Fit a peak with a gaussian function and a background with a linear function 
     
     :param hist: ROOT histogram object.
     :param peak: Peak position.
     :param sigma: Range of the peak.
-    :param min_fit: Minimum value of the fit.
-    :param max_fit: Maximum value of the fit.
+    :param left_step: Left step from the center of the Compton peak for the fit.
+    :param right_step: Right step from the center of the Compton peak for the fit.
     :param x_axis_name: Name of the x-axis. 
     :param y_axis_name: Name of the y-axis.
     :param file_path: Path to save the plots.
@@ -26,16 +27,6 @@ def fit_peaks(hist, peak, sigma, min_fit, max_fit, x_axis_name, y_axis_name, fil
     str0 = ["Amp", "<x>", "#sigma"]
     coo1 = [0.1, 0.5, 0.45, 0.9]
     coo2 = [0.1, 0.35, 0.45, 0.9]
-
-    #-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-    # PARTIAL FIT - Background
-    #-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-    f_back_e = ROOT.TF1("f_background", "expo(0)", 0, 2000)
-    f_back_e.SetParameter(0, 1)
-    f_back_e.SetParameter(1, 1)
-
-    mpr.stampa_graph_fit(hist, f_back_e, file_path + "background_exp_.png", "Compton peak", 
-                         x_axis_name, y_axis_name, "", 500, 2000, 2, coo0, ["f1", "f2"])
     
     #-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
     # PARTIAL FIT - Compton peak
@@ -49,82 +40,94 @@ def fit_peaks(hist, peak, sigma, min_fit, max_fit, x_axis_name, y_axis_name, fil
                          x_axis_name, y_axis_name, "", peak - 2 * sigma, peak + 2 * sigma, 3, coo0, str0)
     
     #-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+    # PARTIAL FIT - 511 peak
+    #-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+    f_511 = ROOT.TF1("511_peak", "gaus(0)", 0, 2000)
+    f_511.SetParameter(0, 100) 
+    f_511.SetParameter(1, 1500)
+    f_511.SetParameter(2, sigma/2)
+
+    mpr.stampa_graph_fit(hist, f_511, file_path + "511_peak_.png", "Compton peak", 
+                         x_axis_name, y_axis_name, "", 1500 - 2 * sigma, 1500 + 2 * sigma, 3, coo0, str0)
+    
+    #-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+    # PARTIAL FIT - background
+    #-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+    f_background = ROOT.TF1("background", "pol4(0) + gaus(5)", 0, 2000)
+    f_background.SetParameter(0, 1)
+    f_background.SetParameter(1, 1)
+    f_background.SetParameter(2, 1)
+    f_background.SetParameter(3, 1)
+    f_background.SetParameter(4, 1)
+    f_background.FixParameter(5, f_511.GetParameter(0))
+    f_background.FixParameter(6, f_511.GetParameter(1))
+    f_background.FixParameter(7, f_511.GetParameter(2))
+
+    mpr.stampa_graph_fit(hist, f_background, file_path + "background_.png", "Background",
+                         x_axis_name, y_axis_name, "", 600, 1800)
+
+    #-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
     # FIT - Complete model
     #-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-    
-    f_true = ROOT.TF1("model", "expo(0) + gaus(2)", 0, 2000) 
-    f_true.SetParameter(0, f_back_e.GetParameter(0))
-    f_true.SetParameter(1, f_back_e.GetParameter(1))
-    f_true.SetParameter(2, f_Compton.GetParameter(0))
-    f_true.SetParameter(3, f_Compton.GetParameter(1))
-    f_true.SetParameter(4, f_Compton.GetParameter(2))
+    f_true = ROOT.TF1("model", "pol4(0) + gaus(5) + gaus(8)", 0, 2000) 
+    f_true.SetParameter(0, f_background.GetParameter(0))
+    f_true.SetParameter(1, f_background.GetParameter(1))
+    f_true.SetParameter(2, f_background.GetParameter(2))
+    f_true.SetParameter(3, f_background.GetParameter(3))
+    f_true.SetParameter(4, f_background.GetParameter(4))
+    f_true.SetParameter(5, f_Compton.GetParameter(0))
+    f_true.SetParameter(6, f_Compton.GetParameter(1))
+    f_true.SetParameter(7, f_Compton.GetParameter(2))
+    f_true.SetParameter(8, f_background.GetParameter(5))
+    f_true.SetParameter(9, f_background.GetParameter(6))
+    f_true.SetParameter(10, f_background.GetParameter(7))
 
-    fit_result = mpr.stampa_graph_fit(hist, f_true, file_path + "final_fit_.png", "Spectrum", 
-                                      x_axis_name, y_axis_name, "", min_fit, max_fit, 5, coo2, ["f1", "f2", "Amp", "<x>", "#sigma"])
+    fit_result = mpr.stampa_graph_fit(hist, f_true, file_path + "final_fit_.png", "Spectrum", x_axis_name, y_axis_name, 
+                                      "", f_Compton.GetParameter(1) - left_step, f_Compton.GetParameter(1) + right_step)
 
-    f_back_e.SetParameter(0, f_true.GetParameter(0))
-    f_back_e.SetParameter(1, f_true.GetParameter(1))
+    f_background.SetParameter(0, f_true.GetParameter(0))
+    f_background.SetParameter(1, f_true.GetParameter(1))    
+    f_background.SetParameter(2, f_true.GetParameter(2))
+    f_background.SetParameter(3, f_true.GetParameter(3))
+    f_background.SetParameter(4, f_true.GetParameter(4))
+    f_background.SetParameter(5, f_true.GetParameter(8))
+    f_background.SetParameter(6, f_true.GetParameter(9))
+    f_background.SetParameter(7, f_true.GetParameter(10))
 
-    return fit_result, f_back_e, f_true
+    return fit_result, f_background, f_true
 
 
 #-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 # Main 
 #-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+# trasmissione
+time = 43200 * 17 + 27346
+# riflessione
+# time = 43000 * 6 + 40184 
+
+angle = 50
+
 H = ll.create_hist(file_path, "hist_sum.png")
 peakCompton = ll.search_photopeak(H, 0.4, 2, file_path + "plots/fit/find_Compton_peak.png")
 sigmaCompton = 50
 
-# Study of the stability of the fit changing fit extremes, in order to choose the domain of the fit
-step = 30
-max_step = 20
-# ll.stability_study_extreme(fit_peaks, H, peakCompton, sigmaCompton, step, max_step, "Energy [channels]", "Counts", file_path + "plots/fit/")
-
-n_steps = 10
-min_fit = peakCompton - n_steps * step
-max_fit = peakCompton + n_steps * step
-
-# Study of the stability of the fit changing hist rebin, in order to choose the domain of the fit
-rebin_max = 32
-# ll.stability_study_rebin(fit_peaks, H, peakCompton, sigmaCompton, rebin_max, min_fit, max_fit, "Energy [channels]", "Counts", file_path + "plots/fit/")
+left_step = 300
+right_step = 300
 
 hist_integral = H.Integral()
 rebin_param = 5
 H.Rebin(rebin_param)
 
-fit_result, f_background, f_true = fit_peaks(H, peakCompton, sigmaCompton, min_fit, max_fit, "Energy [channels]", "Counts", 
+fit_result, f_background, f_true = fit_peaks(H, peakCompton, sigmaCompton, left_step, right_step, "Energy [channels]", "Counts", 
                                              file_path + "plots/fit/")
 
-time = 43000 * 6 + 40184 
+E_mean = (f_true.GetParameter(6), f_true.GetParError(6))
+sigma = (f_true.GetParameter(7), f_true.GetParError(7))
+min_fit = E_mean[0] - left_step
+max_fit = E_mean[0] + right_step
 
 # Final fit
-counts , rate = ll.plot_results(H, hist_integral, fit_result, f_background, f_true, rebin_param, min_fit, max_fit, file_path + "plots/fit/", 
-                "fit_results.png", "Energy [channels]", "Counts", time)
+counts , rate = ll.plot_results(H, fit_result, f_background, f_true, rebin_param, time, E_mean, sigma, min_fit, max_fit, 
+                                file_path + "plots/fit/", "fit_results.png", "Energy [channels]", "Counts")
 
-centroid = f_true.GetParameter(3)
-centroid_err = f_true.GetParError(3)
-angle = 50
-
-def update_or_append_line(file_name, angle, rate, rate_err, counts, counts_err, centroid, centroid_err):
-    # Formattazione della nuova riga
-    new_line = f"{angle}\t{rate:.5f}\t{rate_err:.5f}\t{counts:.1f}\t{counts_err:.1f}\t{centroid:.2f}\t{centroid_err:.2f}\n"
-    
-    # Legge tutte le righe esistenti, se ci sono
-    try:
-        with open(file_name, "r") as f:
-            lines = f.readlines()
-    except FileNotFoundError:
-        lines = []
-
-    # Filtra le righe: tiene solo quelle che non iniziano con lo stesso angolo
-    updated_lines = [line for line in lines if not line.strip().startswith(str(angle))]
-
-    # Aggiunge la nuova riga
-    updated_lines.append(new_line)
-
-    # Riscrive tutto il file con la riga aggiornata
-    with open(file_name, "w") as f:
-        f.writelines(updated_lines)
-
-
-update_or_append_line("parameters.txt", angle, rate[0], rate[1], counts[0], counts[1], centroid, centroid_err)
+ll.update_or_append_line("parameters.txt", angle, rate[0], rate[1], counts[0], counts[1], E_mean[0], E_mean[1], sigma[0], sigma[1])

@@ -139,6 +139,35 @@ def calibration(x, a = 0.36, b = -11.5):
 
 
 #*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+# Efficiency
+#*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+def efficiency (Angle):
+    """
+    Efficiency function for Compton scattering.
+
+    :param Angle: Scattering angle in degrees.
+    :return: Efficiency value.
+    """
+    def compton_scattering(theta):
+        """
+        Compton scattering formula for efficiency calculation.
+
+        :param theta: Scattering angle in degrees.
+        :return: Efficiency value.
+        """
+        return 511 / (2 - np.cos(theta))
+    
+    A = 1.55710
+    B = -0.09831
+    C = 3.53226
+    D = 0.10209
+
+    Energy = compton_scattering(Angle)
+
+    return  A* Energy^(-B) * np.exp(-Energy*C) + D
+
+
+#*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 # Fit functions for Compton study
 #*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 def fit_photopeak_linear_background(hist, fileNamePNG, noise_threshold, n_peaks):
@@ -275,12 +304,11 @@ def stampa_graph_fit_ComptonStudy(hist, f_true, scale_factor, min, max, file_pat
         canvas.Print(file_path + "plots/fit/" + fileNamePNG, "png")
 
 
-def plot_results(hist, hist_integral, fit_result, f_background, f_true, rebin_param, min_fit, max_fit, file_path, fileNamePNG, x_axis_name, y_axis_name, time):
+def plot_results(hist, fit_result, f_background, f_true, rebin_param, time, E_mean: tuple, sigma: tuple, min_fit, max_fit, file_path, fileNamePNG, x_axis_name, y_axis_name):
     """
     Plot the results of the fit."
 
     :param hist: ROOT histogram object."
-    :param hist_integral: Integral of the histogram before rebinning."
     :param fit_result: Fit result."
     :param f_background: Background function."
     :param f_true: True function."
@@ -296,8 +324,6 @@ def plot_results(hist, hist_integral, fit_result, f_background, f_true, rebin_pa
     ndf = fit_result.Ndf()
     chi2_ndf = chi2 / ndf
 
-    E_mean = (f_true.GetParameter(3), f_true.GetParError(3))
-    sigma = (f_true.GetParameter(4), f_true.GetParError(4))
     FWHM = (2.355 * sigma[0], 2.355 * sigma[1])
     ER = (FWHM[0] / E_mean[0], np.sqrt((FWHM[1] / E_mean[0]) ** 2 + (FWHM[0] * E_mean[1] / E_mean[0] ** 2) ** 2))
 
@@ -310,7 +336,7 @@ def plot_results(hist, hist_integral, fit_result, f_background, f_true, rebin_pa
     text += f"<E> = {E_mean[0]:.2f} ± {E_mean[1]:.2f}\n"
     text += f"ER = {ER[0]:.3f} ± {ER[1]:.3f}\n"
     text += f"N = {N_hit[0]:.2f} ± {N_hit[1]:.2f}\n"
-    text += f"Rate = {rate[0]:.4f} ± {rate[1]:.4f} Hz\n"
+    text += f"Rate = {rate[0]:.5f} ± {rate[1]:.5f} Hz\n"
 
     #-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
     # PLOT RESULTS - total fit and background
@@ -423,11 +449,11 @@ def hist_vector(directory_path):
     for j, hist_file_name in enumerate(hist_file_names):
         
         data = read_histogram_data(directory_path + hist_file_name)
-        n_bins = int(calibration(len(data)))
+        n_bins = int(len(data))
         hist = ROOT.TH1D(f"h{j}", f"h{j}", n_bins, 0, n_bins)
         
         for i, bin_value in enumerate(data):
-            hist.SetBinContent(int(calibration(i)) + 1, bin_value)
+            hist.SetBinContent(int(i) + 1, bin_value)
         
         hist_list.append(hist)
     
@@ -666,3 +692,50 @@ def stability_study_rebin(fit_peaks, H, peakCompton, sigmaCompton, rebin_max, mi
     plt.savefig(plot_file)
     plt.close()
     print(f"Rebin stability summary plot saved to {plot_file}")
+
+
+#*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+# Saving parameters by ricky
+#*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+def update_or_append_line(file_name, angle, rate, rate_err, counts, counts_err, centroid, centroid_err, sigma, sigma_err):
+    """
+    Updates or appends a line in a file with the given parameters.
+
+    :param file_name: Name of the file to update.
+    :param angle: Angle value to write.
+    :param rate: Rate value to write.
+    :param rate_err: Rate error value to write.
+    :param counts: Counts value to write.
+    :param counts_err: Counts error value to write.
+    :param centroid: Centroid value to write.
+    :param centroid_err: Centroid error value to write.
+    :param sigma: Sigma value to write.
+    :param sigma_err: Sigma error value to write.
+    """
+    new_line = f"{angle}\t{rate:.5f}\t{rate_err:.5f}\t{counts:.1f}\t{counts_err:.1f}\t{centroid:.2f}\t{centroid_err:.2f}\t{sigma:.2f}\t{sigma_err:.2f}\n"
+
+    try:
+        with open(file_name, "r") as f:
+            lines = f.readlines()
+    except FileNotFoundError:
+        lines = []
+
+    updated_lines = []
+    for line in lines:
+        try:
+            existing_angle = int(line.strip().split()[0])
+            if existing_angle != int(angle):
+                updated_lines.append(line)
+        except (ValueError, IndexError):
+            updated_lines.append(line)  # se la riga è malformata la manteniamo
+
+    updated_lines.append(new_line)
+
+    try:
+        with open(file_name, "w") as f:
+            f.writelines(updated_lines)
+        print("DONE!!")
+    except Exception as e:
+        print("WRONG")
+        print(f"Errore: {e}")
